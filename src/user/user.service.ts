@@ -53,7 +53,12 @@ export class UserService {
       if(Plantype !== 'FREE'){
         return myUser
       }
-      return this.authService.login(loginDto);
+      else{
+        if(myUser){
+          const result = await this.authService.login(loginDto)
+          return result
+        }
+      }
   }
   private userSelect = {
     id: true,
