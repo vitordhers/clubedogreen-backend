@@ -41,7 +41,7 @@ export class UserService {
     const myUser = this.prisma.user
       .create({
         data,
-        select: { Name: true, Email: true, Cpf: true },
+        select: { Name: true, Email: true},
       })
       .catch(this.handleError);
 
@@ -50,7 +50,7 @@ export class UserService {
         Password: dto.Password
       }
 
-      if(Plantime !== 'FREE'){
+      if(Plantype !== 'FREE'){
         return myUser
       }
       return this.authService.login(loginDto);
