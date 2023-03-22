@@ -38,7 +38,7 @@ export class UserService {
       Nextpayment: Nextpayment
     };
 
-    const myUser = this.prisma.user
+    const myUser = await this.prisma.user
       .create({
         data,
         select: { Name: true, Email: true},
