@@ -32,10 +32,11 @@ export class UserService {
   async create(dto: CreateUserDto,Plantype:string,Plantime:string,Nextpayment:string) {
     const data: Prisma.UserCreateInput = {
       ...dto,
+      ReturnDate: '',
       Password: await bcrypt.hash(dto.Password, 10),
       Plantime: Plantime,
       Plantype: Plantype,
-      Nextpayment: Nextpayment
+      Nextpayment: Nextpayment,
     };
 
     const myUser = await this.prisma.user

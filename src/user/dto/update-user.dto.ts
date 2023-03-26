@@ -44,4 +44,5 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   Plantype?: string;
   Plantime?:string;
   Nextpayment?:string;
+  ReturnDate?: string;
 }

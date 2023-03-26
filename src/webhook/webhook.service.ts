@@ -40,6 +40,7 @@ export class WebhookService {
       Password: data.client_documment,
       Email: data.client_email,
       Cpf: data.client_documment,
+      ReturnDate: null
     }
     if (!record) {
       const newUser = this.userService.create(createUserDto,data.plan_name,data.product_name,data.subs_next_charge)

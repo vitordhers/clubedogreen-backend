@@ -13,7 +13,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateCheck, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -36,5 +36,13 @@ export class UserController {
   })
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto,'FREE','INFINITY','');
+  }
+
+  @Patch('/create-check')
+  @ApiOperation({
+    summary: 'Atualiza data de retorno do usuário | FREE',
+  })
+  createCheck(@Body() createCheck: CreateCheck) {
+    return this.userService.update(createCheck.UserId,{ReturnDate: createCheck.ReturnDate});
   }
 }
