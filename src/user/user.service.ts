@@ -5,16 +5,19 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, UpdateMyPasswordDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
 import { AuthService } from 'src/auth/auth.service';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService,
-    private readonly authService: AuthService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly authService: AuthService,
+  ) {}
 
   async update(id: string, dto: UpdateUserDto) {
     await this.findById(id);
@@ -29,7 +32,12 @@ export class UserService {
     });
   }
 
-  async create(dto: CreateUserDto,Plantype:string,Plantime:string,Nextpayment:string) {
+  async create(
+    dto: CreateUserDto,
+    Plantype: string,
+    Plantime: string,
+    Nextpayment: string,
+  ) {
     const data: Prisma.UserCreateInput = {
       ...dto,
       ReturnDate: '',
@@ -42,24 +50,23 @@ export class UserService {
     const myUser = await this.prisma.user
       .create({
         data,
-        select: { Name: true, Email: true},
+        select: { Name: true, Email: true },
       })
       .catch(this.handleError);
 
-      const loginDto = {
-        Email: dto.Email,
-        Password: dto.Password
-      }
+    const loginDto = {
+      Email: dto.Email,
+      Password: dto.Password,
+    };
 
-      if(Plantype !== 'FREE'){
-        return myUser
+    if (Plantype !== 'FREE') {
+      return myUser;
+    } else {
+      if (myUser) {
+        const result = await this.authService.login(loginDto);
+        return result;
       }
-      else{
-        if(myUser){
-          const result = await this.authService.login(loginDto)
-          return result
-        }
-      }
+    }
   }
   private userSelect = {
     id: true,
@@ -67,6 +74,7 @@ export class UserService {
     Email: true,
     Cpf: true,
     Plantime: true,
+    Password: true,
     Plantype: true,
     createdAt: true,
     updatedAt: true,
@@ -84,6 +92,15 @@ export class UserService {
     });
   }
 
+  async findUserByEmail(email: string) {
+    const record = await this.prisma.user.findUnique({
+      where: { Email: email },
+      select: this.userSelect,
+    });
+
+    return record;
+  }
+
   async findById(id: string) {
     const record = await this.prisma.user.findUnique({
       where: { id },
@@ -95,6 +112,40 @@ export class UserService {
     }
 
     return record;
+  }
+
+  async updateRecoveryPassword(id, recoverPasswordToken) {
+    const record = await this.prisma.user.update({
+      where: { id },
+      data: { recoverPasswordToken },
+    });
+
+    return record;
+  }
+
+  async updatePassword(id: string, Password: string) {
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        recoverPasswordToken: null,
+        Password,
+      },
+    });
+
+    delete updatedUser.Password;
+
+    return updatedUser;
+  }
+
+  async updateMyPassword(updateMyPasswordDto: UpdateMyPasswordDto, id: string) {
+    const data = { ...updateMyPasswordDto };
+    return this.prisma.user.update({ where: { id }, data });
+  }
+
+  async findByToken(recoverPasswordToken: any) {
+    return this.prisma.user.findFirst({ where: { recoverPasswordToken } });
   }
 
   async findOne(id: string) {

@@ -3,6 +3,7 @@ export class User {
   Name: string;
   Email: string;
   Password: string;
+  recoverPasswordToken: string;
   Cpf: string;
   IsAdmin?: boolean;
   Profiles?: string[];

@@ -8,17 +8,18 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  Name        String
-  Email       String   @unique
-  Password    String
-  Cpf         String
-  Plantime    String
-  ReturnDate  String
-  Plantype    String
-  Nextpayment String
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id                   String   @id @default(uuid())
+  Name                 String
+  Email                String   @unique
+  Password             String
+  Cpf                  String
+  Plantime             String
+  ReturnDate           String
+  recoverPasswordToken String?
+  Plantype             String
+  Nextpayment          String
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
 
   @@map("user")
 }

@@ -15,8 +15,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
-    .setTitle('Gamestock')
-    .setDescription('Aplicação para gestão de games ')
+    .setTitle('Clube dos sinais')
+    .setDescription('Geral api')
     .setVersion('1.0.0')
     .addTag('status')
     .addTag('auth')
