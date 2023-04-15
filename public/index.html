@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="icon" href="https://docs.google.com/uc?id=1FYlz-LUG1aTodOpVbMxz7keOLV4u9G9d" type="image/x-icon">
+    <link
+      rel="icon"
+      href="https://docs.google.com/uc?id=1FYlz-LUG1aTodOpVbMxz7keOLV4u9G9d"
+      type="image/x-icon"
+    />
     <meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clube do Green | Recuperar senha</title>
     <style>
@@ -104,18 +109,66 @@
           border: none;
         }
       }
+
+      .alert {
+        top: 3%;
+        position: absolute;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      .alert-primary {
+        color: #35ff1a;
+        background-color: #cce5ff;
+        border-color: #b8daff;
+      }
+
+      .alert-warning {
+        color: #00ea5a;
+        background-color: #484848;
+        border-radius: 12px;
+      }
+
+      .alert-heading {
+        margin-top: 0;
+      }
+
+      .alert hr {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        border: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .d-none {
+        display: none !important;
+      }
+
+      .btn {
+        padding: 6px 18px;
+        border: none;
+        border-radius: 8px;
+        background-color: #00ea5a;
+      }
     </style>
   </head>
   <body>
     <div id="container">
+      <div id="myAlert" class="alert alert-warning d-none" role="alert">
+        <h4 class="alert-heading">Erro</h4>
+        <p style="font-size: small">As senhas não são iguais!</p>
+        <hr />
+        <button id="closeAlertBtn" type="button" class="btn btn-danger">
+          Fechar
+        </button>
+      </div>
+      <div id="logo-container">
+        <img src="https://i.ibb.co/B2z2yFL/atual-logo.png" class="logo" />
+      </div>
       <form>
-        <div id="logo-container">
-          <img
-            src="https://docs.google.com/uc?id=1WrVcULWKd4a0t6cqHUS6ZEjg6e-a1zCZ"
-            class="logo"
-          />
-        </div>
-
         <label class="input-text" for="password">Nova senha:</label>
         <input type="text" id="password" name="password" /><br /><br />
         <label class="input-text" for="confirmPassword"
@@ -132,28 +185,51 @@
       </form>
     </div>
     <script>
+      $(document).ready(function () {
+        $('#showAlertBtn').on('click', function () {
+          $('#myAlert').removeClass('d-none');
+        });
+      });
+
+      $(document).ready(function () {
+        $('#closeAlertBtn').on('click', function () {
+          $('#myAlert').addClass('d-none');
+        });
+      });
+
       const urlParams = new URLSearchParams(window.location.search);
-      console.log(urlParams.get('token')); // Output: "value1"
       const form = document.querySelector('form');
       const passwordInput = document.querySelector('#password');
       const confirmPasswordInput = document.querySelector('#confirmPassword');
       const submitButton = document.querySelector('#submitButton');
 
       submitButton.addEventListener('click', () => {
+        const token = urlParams.get('token');
         const password = passwordInput.value;
         const confirmPassword = confirmPasswordInput.value;
-
-        // Send a POST request to the server with the form data
-        fetch('/submit-form', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ password, confirmPassword }),
-        })
-          .then((response) => response.json())
-          .then((data) => console.log(data))
-          .catch((error) => console.error(error));
+        const data = {
+          password: password,
+          confirmPassword: confirmPassword,
+          recoverPasswordToken: token,
+        };
+        if (password !== confirmPassword) {
+          $(document).ready(function () {
+            $('#showAlertBtn').trigger('click');
+          });
+        } else {
+          console.log(data);
+          // Send a POST request to the server with the form data
+          fetch('https://clubedogreen.onrender.com/update-password', {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => response.json())
+            .then((data) => console.log(data))
+            .catch((error) => console.error(error));
+        }
       });
     </script>
   </body>

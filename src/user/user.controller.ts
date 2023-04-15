@@ -31,7 +31,17 @@ export class UserController {
 
   @Get('/recovery-password')
   getIndexHtml(@Res() res, @Query('token') token: string) {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+    if (process.env.PROD_URL !== '') {
+      res.sendFile(path.join(__dirname, '../public/index.html'));
+    } else {
+      const filePath = path.join(
+        process.cwd(),
+        '..',
+        'gamestock-back/public',
+        'index.html',
+      );
+      res.sendFile(path.join(filePath));
+    }
   }
 
   @Patch('/create-check')
