@@ -153,10 +153,15 @@
         border-radius: 8px;
         background-color: #00ea5a;
       }
+
+      #showAlertBtn {
+        display: none;
+      }
     </style>
   </head>
   <body>
     <div id="container">
+      <button id="showAlertBtn" type="button" class="btn btn-danger"></button>
       <div id="myAlert" class="alert alert-warning d-none" role="alert">
         <h4 class="alert-heading">Erro</h4>
         <p style="font-size: small">As senhas não são iguais!</p>
@@ -212,6 +217,7 @@
           confirmPassword: confirmPassword,
           recoverPasswordToken: token,
         };
+        console.log(password !== confirmPassword);
         if (password !== confirmPassword) {
           $(document).ready(function () {
             $('#showAlertBtn').trigger('click');
