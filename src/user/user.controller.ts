@@ -31,7 +31,12 @@ export class UserController {
 
   @Get('/recovery-password')
   getIndexHtml(@Res() res, @Query('token') token: string) {
-    const filePath = path.join(__dirname, '../public/index.html')
+    const filePath = path.join(
+      process.cwd(),
+      '..',
+      'gamestock-back/src/public',
+      'index.html',
+    );
     res.sendFile(filePath);
   }
 
