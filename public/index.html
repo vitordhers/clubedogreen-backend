@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="icon" href="https://docs.google.com/uc?id=1FYlz-LUG1aTodOpVbMxz7keOLV4u9G9d" type="image/x-icon">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clube do Green | Recuperar senha</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700&display=swap');
+
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', sans-serif;
+      }
+
+      body {
+        background-color: #272727;
+        height: 100%;
+        padding: 0 4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      form {
+        width: 100%;
+        gap: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      label {
+        font-size: 16px;
+        color: #00ea5a;
+        padding-bottom: 5%;
+      }
+
+      input {
+        padding: 12px 24px;
+        box-sizing: border-box;
+        font-size: 14px;
+        border-radius: 10px;
+        border: none;
+        outline: none;
+      }
+
+      #container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #button-container {
+        width: 100%;
+        padding-top: 20%;
+      }
+
+      .logo {
+        width: 100px;
+      }
+
+      #logo-container {
+        width: 100%;
+        padding: 10% 0 25% 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #submitButton {
+        width: 100%;
+        padding: 12px 24px;
+        font-size: 14px;
+        border-radius: 12px;
+        background: #00ea5a;
+        color: #272727;
+        font-weight: 600;
+      }
+
+      @media screen and (min-width: 768px) {
+        #container {
+          width: 50%;
+        }
+      }
+
+      @media screen and (min-width: 1024px) {
+        #container {
+          width: 25%;
+        }
+        label {
+          font-size: 12px;
+        }
+        input {
+          padding: 10px 20px;
+          box-sizing: border-box;
+          font-size: 12px;
+        }
+        #submitButton {
+          padding: 10px 20px;
+          font-size: 12px;
+          border: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <form>
+        <div id="logo-container">
+          <img
+            src="https://docs.google.com/uc?id=1WrVcULWKd4a0t6cqHUS6ZEjg6e-a1zCZ"
+            class="logo"
+          />
+        </div>
+
+        <label class="input-text" for="password">Nova senha:</label>
+        <input type="text" id="password" name="password" /><br /><br />
+        <label class="input-text" for="confirmPassword"
+          >Insira novamente a senha:</label
+        >
+        <input
+          type="text"
+          id="confirmPassword"
+          name="confirmPassword"
+        /><br /><br />
+        <div id="button-container">
+          <button type="button" id="submitButton">Confirmar</button>
+        </div>
+      </form>
+    </div>
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      console.log(urlParams.get('token')); // Output: "value1"
+      const form = document.querySelector('form');
+      const passwordInput = document.querySelector('#password');
+      const confirmPasswordInput = document.querySelector('#confirmPassword');
+      const submitButton = document.querySelector('#submitButton');
+
+      submitButton.addEventListener('click', () => {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        // Send a POST request to the server with the form data
+        fetch('/submit-form', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ password, confirmPassword }),
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data))
+          .catch((error) => console.error(error));
+      });
+    </script>
+  </body>
+</html>
