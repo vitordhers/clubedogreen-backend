@@ -204,6 +204,7 @@
       const submitButton = document.querySelector('#submitButton');
 
       submitButton.addEventListener('click', () => {
+        window.location.href = 'https://www.google.com.br/';
         const token = urlParams.get('token');
         const password = passwordInput.value;
         const confirmPassword = confirmPasswordInput.value;
@@ -226,7 +227,15 @@
             },
             body: JSON.stringify(data),
           })
-            .then((response) => response.json())
+            .then((response) => {
+              if (response.ok) {
+                // Redirect to the success page
+                window.location.href = 'https://www.google.com.br/';
+              } else {
+                console.error('Failed to fetch data');
+              }
+              response.json();
+            })
             .then((data) => console.log(data))
             .catch((error) => console.error(error));
         }
