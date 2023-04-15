@@ -40,7 +40,6 @@ export class UserService {
   ) {
     const data: Prisma.UserCreateInput = {
       ...dto,
-      ReturnDate: '',
       Password: await bcrypt.hash(dto.Password, 10),
       Plantime: Plantime,
       Plantype: Plantype,

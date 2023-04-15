@@ -47,15 +47,9 @@ export class CreateUserDto {
 }
 
 export class CreateCheck {
-  @IsString()
-  @ApiProperty({
-    description: 'Data de retorno de uso do plano free',
-    example: '2023-03-26T18:18:33.385Z',
-  })
-  ReturnDate: string;
   @ApiProperty({
     description: 'User id',
-    example: '2023-03-26T18:18:33.385Z',
+    example: 'eda03bb5-0700-49db-bb63-8941',
   })
   UserId: string;
 }

@@ -45,4 +45,11 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   Plantime?:string;
   Nextpayment?:string;
   ReturnDate?: string;
+  Validation?: string;
+}
+
+
+interface Validate {
+  ReturnDate: Date;
+  LimitHour: Date;
 }

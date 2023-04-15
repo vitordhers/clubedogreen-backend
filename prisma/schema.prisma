@@ -14,8 +14,9 @@ model User {
   Password             String
   Cpf                  String
   Plantime             String
-  ReturnDate           String
+  Validation           String?
   recoverPasswordToken String?
+  reviewed             Boolean?
   Plantype             String
   Nextpayment          String
   createdAt            DateTime @default(now()) @map("created_at")

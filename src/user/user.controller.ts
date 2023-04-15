@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Res,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Res, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   CreateCheck,
@@ -39,7 +31,7 @@ export class UserController {
 
   @Get('/recovery-password')
   getIndexHtml(@Res() res, @Query('token') token: string) {
-    const filePath = path.join(process.cwd(), '..', 'gamestock-back/public', 'index.html');
+    const filePath = path.join(__dirname, '../public/index.html')
     res.sendFile(filePath);
   }
 
@@ -48,8 +40,18 @@ export class UserController {
     summary: 'Atualiza data de retorno do usuário | FREE',
   })
   createCheck(@Body() createCheck: CreateCheck) {
+    let currentDate = new Date();
+    currentDate.setTime(currentDate.getTime() + 24 * 60 * 60 * 1000);
+
+    const now = new Date();
+    const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000); // add 1 hour in milliseconds
+    const result = {
+      ReturnDate: currentDate,
+      LimitHour: oneHourLater,
+    };
+
     return this.userService.update(createCheck.UserId, {
-      ReturnDate: createCheck.ReturnDate,
+      Validation: JSON.stringify(result),
     });
   }
 
@@ -70,7 +72,7 @@ export class UserController {
     summary: 'User update password.',
   })
   updatePassword(@Body() updatePassword: CreatePasswordHashDto) {
-    console.log(updatePassword)
+    console.log(updatePassword);
     return this.updatePasswordByEmailService.execute(updatePassword);
   }
 }

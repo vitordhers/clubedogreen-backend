@@ -20,7 +20,7 @@ import { UserModule } from 'src/user/user.module';
             pass: "mmfptpweeadtlgtn",
           },
           tls: {
-            rejectUnauthorized: false,
+            rejectUnauthorized: true,
           }
         },
         template: {
