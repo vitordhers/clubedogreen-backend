@@ -81,7 +81,6 @@ export class UserController {
     summary: 'User update password.',
   })
   updatePassword(@Body() updatePassword: CreatePasswordHashDto) {
-    console.log(updatePassword);
     return this.updatePasswordByEmailService.execute(updatePassword);
   }
 }
