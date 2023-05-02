@@ -49,6 +49,22 @@ export class UserController {
     // return this.userService.create(createUserDto);
   }
 
+  @Post('/webhook-applestore')
+  @ApiOperation({
+    summary: 'Webhook | payment apple',
+  })
+  createPaymentApple(@Body() Webhook: any) {
+    /*
+    const userExist = this.webhookService.webhookValidation(
+      Webhook.client_email,
+      Webhook,
+    );
+    */
+   console.log(Webhook)
+    return Webhook;
+    // return this.userService.create(createUserDto);
+  }
+
   @Post('/reviews-googleplay')
   @ApiOperation({
     summary: 'Webhook | google play reviews trigger',

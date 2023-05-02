@@ -54,6 +54,14 @@ export class CreateCheck {
   UserId: string;
 }
 
+export class RemoveUser {
+  @ApiProperty({
+    description: 'User id',
+    example: 'eda03bb5-0700-49db-bb63-8941',
+  })
+  UserId: string;
+}
+
 export class UserEmailDto {
   @IsString()
   @IsEmail()

@@ -5,6 +5,7 @@ import {
   CreatePasswordHashDto,
   CreateUserDto,
   UserEmailDto,
+  RemoveUser,
 } from './dto/create-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -62,6 +63,14 @@ export class UserController {
     return this.userService.update(createCheck.UserId, {
       Validation: JSON.stringify(result),
     });
+  }
+
+  @Patch('/delete-account')
+  @ApiOperation({
+    summary: 'Deleta usuario',
+  })
+  removeAccount(@Body() userId: RemoveUser) {
+    return this.userService.delete(userId.UserId);
   }
 
   @Patch('/recovery-password')
