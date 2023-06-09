@@ -51,7 +51,6 @@ export class WebhookService {
       Cpf: data.client_documment,
       ReturnDate: null,
     };
-
     var next_charge = new Date();
     var next_charge_result;
     switch (data.plan_key) {
@@ -74,7 +73,7 @@ export class WebhookService {
         next_charge_result = this.formatDate(next_charge);
         break;
     }
-
+    createUserDto.ReturnDate = next_charge_result;
     if (!record) {
       const newUser = this.userService.create(
         createUserDto,
@@ -88,11 +87,28 @@ export class WebhookService {
         Plantype: data.plan_name,
         Plantime: data.product_name,
         Nextpayment: next_charge_result,
-        Validation: null
+        Validation: null,
       };
-      console.log(newData)
+      console.log(newData);
       const newUser = this.userService.update(record.id, newData);
       return newUser;
     }
+  }
+
+  async webhookAutoFree(email: string, data: WebhookDto) {
+    const record = await this.prisma.user.findUnique({
+      where: { Email: email },
+      select: this.userSelect,
+    });
+
+    const newData = {
+      Plantype: 'FREE',
+      Plantime: 'INFINITY',
+      Validation: null,
+      Nextpayment: '',
+    };
+    console.log(newData);
+    const newUser = this.userService.update(record.id, newData);
+    return newUser;
   }
 }

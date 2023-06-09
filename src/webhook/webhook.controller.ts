@@ -41,11 +41,21 @@ export class UserController {
     summary: 'Webhook | payment',
   })
   create(@Body() Webhook: WebhookDto) {
-    const userExist = this.webhookService.webhookValidation(
-      Webhook.client_email,
-      Webhook,
-    );
-    return userExist;
+    console.log(Webhook);
+    if (Webhook.type === 'VENDA_COMPLETA') {
+      const userExist = this.webhookService.webhookValidation(
+        Webhook.client_email,
+        Webhook,
+      );
+      return userExist;
+    } else {
+      const autoFree = this.webhookService.webhookAutoFree(
+        Webhook.client_email,
+        Webhook,
+      );
+      return autoFree;
+    }
+
     // return this.userService.create(createUserDto);
   }
 
@@ -60,7 +70,7 @@ export class UserController {
       Webhook,
     );
     */
-   console.log(Webhook)
+    console.log(Webhook);
     return Webhook;
     // return this.userService.create(createUserDto);
   }
@@ -79,13 +89,15 @@ export class UserController {
       ReturnDate: currentDate,
       LimitHour: oneHourLater,
     };
-    const thisUser = await this.userService.findUserByEmail(Webhook.message.feedback.userEmail)
-    if(thisUser){
+    const thisUser = await this.userService.findUserByEmail(
+      Webhook.message.feedback.userEmail,
+    );
+    if (thisUser) {
       return this.userService.update(thisUser.id, {
         Validation: JSON.stringify(result),
       });
-    }else{
-      return {message: "This user doens't exist"}
+    } else {
+      return { message: "This user doens't exist" };
     }
   }
 
