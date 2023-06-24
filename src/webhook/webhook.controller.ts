@@ -3,12 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
+  Ip,
   Req,
   ForbiddenException,
 } from '@nestjs/common';
@@ -16,9 +11,7 @@ import { WebhookService } from './webhook.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { CaslAbilityFactory } from 'src/casl/casl-ability.factory';
-import { Action } from 'src/casl/enum';
-import { LoggedUser } from 'src/auth/logged-user-decorator';
-import { User } from '@prisma/client';
+import * as requestIp from 'request-ip';
 import {
   WebhookApple,
   WebhookDto,
@@ -26,6 +19,7 @@ import {
 } from './dto/create-user.dto';
 import { ResponseWebhook } from './entities/webhook.entity';
 import { UserService } from 'src/user/user.service';
+import { IpAddress } from './test';
 
 @ApiTags('webhook')
 @Controller('webhook')
@@ -57,6 +51,12 @@ export class UserController {
     }
 
     // return this.userService.create(createUserDto);
+  }
+
+  @Post('/test-ip')
+  createUser(@Ip() ip) {
+    console.log(ip);
+    return ip;
   }
 
   @Post('/webhook-applestore')

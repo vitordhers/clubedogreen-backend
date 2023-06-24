@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Res, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Res,
+  Query,
+  Ip,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   CreateCheck,
@@ -26,8 +36,15 @@ export class UserController {
   @ApiOperation({
     summary: 'Criar um usuário',
   })
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto, 'FREE', 'INFINITY', '');
+  create(@Body() createUserDto: CreateUserDto, @Ip() ip) {
+    const check = this.userService.findUserByIp;
+    if (check) {
+      // ALREADY EXIST
+      throw new NotFoundException("Lamentamos, parece que você já possui uma conta conosco.");
+    } else {
+      // DOENST EXIST
+      return this.userService.create(createUserDto, 'FREE', 'INFINITY', '', ip);
+    }
   }
 
   @Get('/recovery-password')

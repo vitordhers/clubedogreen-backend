@@ -80,6 +80,7 @@ export class WebhookService {
         data.plan_name,
         data.product_name,
         next_charge_result,
+        ''
       );
       return newUser;
     } else {

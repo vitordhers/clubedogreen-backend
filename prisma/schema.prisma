@@ -13,6 +13,7 @@ model User {
   Email                String   @unique
   Password             String
   Cpf                  String
+  ip                   String   @unique
   Plantime             String
   Validation           String?
   recoverPasswordToken String?

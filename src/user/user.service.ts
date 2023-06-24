@@ -37,12 +37,14 @@ export class UserService {
     Plantype: string,
     Plantime: string,
     Nextpayment: string,
+    ip: string,
   ) {
     const data: Prisma.UserCreateInput = {
       ...dto,
       Password: await bcrypt.hash(dto.Password, 10),
       Plantime: Plantime,
       Plantype: Plantype,
+      ip: ip,
       Nextpayment: Nextpayment,
     };
 
@@ -98,6 +100,19 @@ export class UserService {
     });
 
     return record;
+  }
+
+  async findUserByIp(ip: string) {
+    const record = await this.prisma.user.findUnique({
+      where: { ip: ip },
+      select: this.userSelect,
+    });
+
+    if (!record) {
+      return false;
+    }
+
+    return true;
   }
 
   async findById(id: string) {
