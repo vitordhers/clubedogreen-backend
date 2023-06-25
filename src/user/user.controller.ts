@@ -37,7 +37,8 @@ export class UserController {
     summary: 'Criar um usuário',
   })
   create(@Body() createUserDto: CreateUserDto, @Ip() ip) {
-    const check = this.userService.findUserByIp;
+    const check = this.userService.findUserByIp(ip);
+    console.log(ip)
     if (check) {
       // ALREADY EXIST
       throw new NotFoundException("Lamentamos, parece que você já possui uma conta conosco.");
