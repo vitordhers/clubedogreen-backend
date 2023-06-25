@@ -36,19 +36,18 @@ export class UserController {
   @ApiOperation({
     summary: 'Criar um usuário',
   })
-  create(@Body() createUserDto: CreateUserDto, @Ip() ip) {
-    const check = this.userService.findUserByIp(ip);
+  async create(@Body() createUserDto: CreateUserDto, @Ip() ip) {
+    const check = await this.userService.findUserByIp(ip);
     console.log(ip);
-    console.log(check);
-    /*
     if (check) {
       // ALREADY EXIST
       throw new NotFoundException("Lamentamos, parece que você já possui uma conta conosco.");
     } else {
       // DOENST EXIST
+      return this.userService.create(createUserDto, 'FREE', 'INFINITY', '', ip);
     }
-    */
-    return this.userService.create(createUserDto, 'FREE', 'INFINITY', '', ip);
+ 
+ 
   }
 
   @Get('/recovery-password')
