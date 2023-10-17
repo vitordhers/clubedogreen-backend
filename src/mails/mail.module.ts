@@ -17,7 +17,7 @@ import { UserModule } from 'src/user/user.module';
           secure: true,
           auth: {
             user: "clubedogreensuporte@gmail.com",
-            pass: "mmfptpweeadtlgtn",
+            pass: process.env.GMAIL_PASSWORD,
           },
           tls: {
             rejectUnauthorized: true,
