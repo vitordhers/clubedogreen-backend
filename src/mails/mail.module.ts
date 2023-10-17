@@ -16,7 +16,7 @@ import { UserModule } from 'src/user/user.module';
           port: 465,
           secure: true,
           auth: {
-            user: "clubedogreensuporte@gmail.com",
+            user: process.env.GMAIL_EMAIL,
             pass: process.env.GMAIL_PASSWORD,
           },
           tls: {
