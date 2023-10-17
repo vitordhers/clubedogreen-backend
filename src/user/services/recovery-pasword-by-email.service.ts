@@ -5,13 +5,13 @@ import { UserService } from '../user.service';
 
 @Injectable()
 export class UpdatePasswordByEmailService {
-  constructor(private userRep: UserService) {}
+  constructor(private userService: UserService) {}
   async execute({
     recoverPasswordToken,
     password,
     confirmPassword,
   }: CreatePasswordHashDto) {
-    const user = await this.userRep.findByToken(recoverPasswordToken)
+    const user = await this.userService.findByToken(recoverPasswordToken);
 
     if (!user) {
       return {
@@ -28,7 +28,7 @@ export class UpdatePasswordByEmailService {
     }
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const userUpdated = await this.userRep.updatePassword(
+    const userUpdated = await this.userService.updatePassword(
       user.id,
       passwordHash,
     );

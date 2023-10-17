@@ -20,14 +20,14 @@ export class CaslAbilityFactory {
       Ability<[Action, Subjects]>
     >(Ability as AbilityClass<AppAbility>);
 
-    if (user.IsAdmin) {
+    if (user.isAdmin) {
       can(Action.Manage, 'all'); // read-write access to everything
     } else {
       can(Action.Read, 'all'); // read-only access to everything
     }
 
-    can(Action.Update, User, { IsAdmin: user.IsAdmin });
-    cannot(Action.Delete, User, { IsAdmin: user.IsAdmin });
+    can(Action.Update, User, { isAdmin: user.isAdmin });
+    cannot(Action.Delete, User, { isAdmin: user.isAdmin });
 
     return build({
       // Read https://casl.js.org/v5/en/guide/subject-type-detection#use-classes-as-subject-types for details

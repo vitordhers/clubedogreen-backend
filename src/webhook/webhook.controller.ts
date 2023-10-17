@@ -94,7 +94,7 @@ export class UserController {
     );
     if (thisUser) {
       return this.userService.update(thisUser.id, {
-        Validation: JSON.stringify(result),
+        validation: JSON.stringify(result),
       });
     } else {
       return { message: "This user doens't exist" };

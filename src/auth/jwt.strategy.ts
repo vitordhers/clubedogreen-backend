@@ -1,11 +1,12 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { FirebaseService } from '../firebase/firebase.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly prisma: PrismaService) {
+  constructor(private readonly userService: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -13,18 +14,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { Email: string }) {
-    const user = await this.prisma.user.findUnique({
-      where: { Email: payload.Email },
-    });
+  async validate({ email }: { email: string }) {
+    const user = await this.userService.findUserByEmail(email);
 
     if (!user) {
       throw new UnauthorizedException(
         'Usuário não existe ou não está autenticado',
       );
     }
-
-    delete user.Password;
 
     return user;
   }

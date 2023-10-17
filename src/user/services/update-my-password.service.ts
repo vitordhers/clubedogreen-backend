@@ -30,7 +30,7 @@ export class RecoveryPasswordByEmail {
       recoverPasswordToken,
     );
 
-    await this.mailService.sendUserConfirmation(userUpdated);
+    // await this.mailService.sendUserConfirmation(userUpdated);
 
     return {
       status: 200,

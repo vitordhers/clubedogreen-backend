@@ -13,11 +13,7 @@ import {
 
 export class CreateUserDto {
   @IsString()
-  @ApiProperty({
-    description: 'Nome do usuário. Apenas para exibição',
-    example: 'Paulo Salvatore',
-  })
-  Name: string;
+  name: string;
 
   @IsString()
   @MinLength(6)
@@ -28,22 +24,22 @@ export class CreateUserDto {
     description: 'Senha do usuário para login',
     example: 'Abcd@1234',
   })
-  Password: string;
+  password: string;
 
-  @IsUrl()
+  @IsEmail()
   @ApiProperty({
     description: 'Email do usuário',
     example: 'example@gmail.com',
   })
-  Email: string;
+  email: string;
 
   @IsString()
   @ApiProperty({
     description: 'Cpf do usuário',
     example: '032.156.627-10',
   })
-  Cpf: string;
-  ReturnDate: string;
+  cpf: string;
+  returnDate: string;
 }
 
 export class CreateCheck {
@@ -51,7 +47,7 @@ export class CreateCheck {
     description: 'User id',
     example: 'eda03bb5-0700-49db-bb63-8941',
   })
-  UserId: string;
+  userId: string;
 }
 
 export class RemoveUser {
@@ -59,7 +55,7 @@ export class RemoveUser {
     description: 'User id',
     example: 'eda03bb5-0700-49db-bb63-8941',
   })
-  UserId: string;
+  userId: string;
 }
 
 export class UserEmailDto {

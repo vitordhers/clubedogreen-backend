@@ -38,16 +38,13 @@ export class UserController {
   })
   async create(@Body() createUserDto: CreateUserDto, @Ip() ip) {
     const check = await this.userService.findUserByIp(ip);
-    console.log(ip);
     if (check) {
-      // ALREADY EXIST
-      throw new NotFoundException("Lamentamos, parece que você já possui uma conta conosco.");
+      throw new NotFoundException(
+        'Lamentamos, parece que você já possui uma conta conosco.',
+      );
     } else {
-      // DOENST EXIST
       return this.userService.create(createUserDto, 'FREE', 'INFINITY', '', ip);
     }
- 
- 
   }
 
   @Get('/recovery-password')
@@ -76,12 +73,12 @@ export class UserController {
     const now = new Date();
     const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000); // add 1 hour in milliseconds
     const result = {
-      ReturnDate: currentDate,
-      LimitHour: oneHourLater,
+      returnDate: currentDate,
+      limitHour: oneHourLater,
     };
 
-    return this.userService.update(createCheck.UserId, {
-      Validation: JSON.stringify(result),
+    return this.userService.update(createCheck.userId, {
+      validation: JSON.stringify(result),
     });
   }
 
@@ -90,7 +87,7 @@ export class UserController {
     summary: 'Deleta usuario',
   })
   removeAccount(@Body() userId: RemoveUser) {
-    return this.userService.delete(userId.UserId);
+    return this.userService.delete(userId.userId);
   }
 
   @Patch('/recovery-password')

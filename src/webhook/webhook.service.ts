@@ -4,31 +4,14 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
-import { Prisma } from '@prisma/client';
-import { AuthService } from 'src/auth/auth.service';
 import { WebhookDto } from './dto/create-user.dto';
 import { UserService } from 'src/user/user.service';
+import { FirebaseService } from 'src/firebase/firebase.service';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Injectable()
 export class WebhookService {
-  constructor(
-    private readonly userService: UserService,
-    private readonly prisma: PrismaService,
-    private readonly authService: AuthService,
-  ) {}
-
-  private userSelect = {
-    id: true,
-    Name: true,
-    Email: true,
-    Cpf: true,
-    Plantime: true,
-    Plantype: true,
-    createdAt: true,
-    updatedAt: true,
-  };
+  constructor(private readonly userService: UserService) {}
 
   private formatDate(value) {
     // Format the result as "YYYY/MM/DD"
@@ -40,16 +23,13 @@ export class WebhookService {
   }
 
   async webhookValidation(email: string, data: WebhookDto) {
-    const record = await this.prisma.user.findUnique({
-      where: { Email: email },
-      select: this.userSelect,
-    });
-    const createUserDto = {
-      Name: data.client_name,
-      Password: data.client_documment,
-      Email: data.client_email,
-      Cpf: data.client_documment,
-      ReturnDate: null,
+    const record = await this.userService.findUserByEmail(email);
+    const createUserDto: CreateUserDto = {
+      name: data.client_name,
+      password: data.client_documment,
+      email: data.client_email,
+      cpf: data.client_documment,
+      returnDate: null,
     };
     var next_charge = new Date();
     var next_charge_result;
@@ -73,22 +53,22 @@ export class WebhookService {
         next_charge_result = this.formatDate(next_charge);
         break;
     }
-    createUserDto.ReturnDate = next_charge_result;
+    createUserDto.returnDate = next_charge_result;
     if (!record) {
       const newUser = this.userService.create(
         createUserDto,
         data.plan_name,
         data.product_name,
         next_charge_result,
-        ''
+        '',
       );
       return newUser;
     } else {
       const newData = {
-        Plantype: data.plan_name,
-        Plantime: data.product_name,
-        Nextpayment: next_charge_result,
-        Validation: null,
+        planType: data.plan_name,
+        planTime: data.product_name,
+        nextPayment: next_charge_result,
+        validation: null,
       };
       console.log(newData);
       const newUser = this.userService.update(record.id, newData);
@@ -97,16 +77,13 @@ export class WebhookService {
   }
 
   async webhookAutoFree(email: string, data: WebhookDto) {
-    const record = await this.prisma.user.findUnique({
-      where: { Email: email },
-      select: this.userSelect,
-    });
+    const record = await this.userService.findUserByEmail(email);
 
     const newData = {
-      Plantype: 'FREE',
-      Plantime: 'INFINITY',
-      Validation: null,
-      Nextpayment: '',
+      planType: 'FREE',
+      planTime: 'INFINITY',
+      validation: null,
+      nextPayment: '',
     };
     console.log(newData);
     const newUser = this.userService.update(record.id, newData);

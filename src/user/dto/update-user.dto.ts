@@ -14,7 +14,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     description: 'Nome do usuário. Apenas para exibição',
     example: 'Paulo Salvatore',
   })
-  Name?: string;
+  name?: string;
 
   @IsString()
   @MinLength(6)
@@ -25,7 +25,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     description: 'Senha do usuário para login',
     example: 'Abcd@1234',
   })
-  Password?: string;
+  password?: string;
 
   @IsUrl()
   @ApiProperty({
@@ -39,15 +39,14 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     description: 'Cpf do usuário',
     example: '032.156.627-10',
   })
-  Cpf?: string;
+  cpf?: string;
 
-  Plantype?: string;
-  Plantime?:string;
-  Nextpayment?:string;
-  ReturnDate?: string;
-  Validation?: string;
+  planType?: string;
+  planTime?: string;
+  nextPayment?: string;
+  returnDate?: string;
+  validation?: string;
 }
-
 
 interface Validate {
   ReturnDate: Date;

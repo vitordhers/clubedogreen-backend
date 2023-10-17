@@ -1,12 +1,16 @@
 export class User {
   id?: string;
-  Name: string;
-  Email: string;
-  Password: string;
-  recoverPasswordToken: string;
-  Cpf: string;
-  IsAdmin?: boolean;
-  Profiles?: string[];
+  name: string;
+  email: string;
+  password?: string;
+  planTime?: string;
+  planType: string;
+  ip?: string;
+  nextPayment?: string;
+  recoverPasswordToken?: string;
+  cpf: string;
+  isAdmin?: boolean;
+  profiles?: string[];
   createdAt?: Date;
   updatedAt?: Date;
 }

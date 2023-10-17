@@ -2,174 +2,215 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  OnModuleInit,
+  UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto, UpdateMyPasswordDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
-import { Prisma } from '@prisma/client';
-import { AuthService } from 'src/auth/auth.service';
 import { User } from './entities/user.entity';
+import { FirebaseService } from 'src/firebase/firebase.service';
+import { LoginDto } from 'src/auth/dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
+import { LoginResponseDto } from 'src/auth/dto/login-response.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
-export class UserService {
+export class UserService implements OnModuleInit {
+  users: FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData>;
+
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly authService: AuthService,
+    private readonly firebase: FirebaseService,
+    private readonly jwtService: JwtService,
   ) {}
 
+  onModuleInit() {
+    this.users = this.firebase.firestore.collection('users');
+  }
+
   async update(id: string, dto: UpdateUserDto) {
-    await this.findById(id);
+    try {
+      const uid = await this.findUId(id);
 
-    const data: Prisma.UserUpdateInput = {
-      ...dto,
-    };
+      const data = {
+        ...dto,
+      };
 
-    return this.prisma.user.update({
-      where: { id },
-      data,
-    });
+      const result = await this.users.doc(uid).update(data);
+      console.log('@@@@ RESULT', { result });
+      const user = await this.findOne(uid);
+      return user;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException(error);
+    }
   }
 
   async create(
     dto: CreateUserDto,
-    Plantype: string,
-    Plantime: string,
-    Nextpayment: string,
+    planType: string,
+    planTime: string,
+    nextPayment: string,
     ip: string,
   ) {
-    const data: Prisma.UserCreateInput = {
+    const salt = await bcrypt.genSalt(10);
+    const password = await bcrypt.hash(dto.password, salt);
+    const data: User = {
       ...dto,
-      Password: await bcrypt.hash(dto.Password, 10),
-      Plantime: Plantime,
-      Plantype: Plantype,
-      ip: ip,
-      Nextpayment: Nextpayment,
+      id: uuidv4(),
+      password,
+      planTime,
+      planType,
+      ip,
+      isAdmin: false,
+      nextPayment,
     };
 
-    const myUser = await this.prisma.user
-      .create({
-        data,
-        select: { Name: true, Email: true },
-      })
-      .catch(this.handleError);
+    const docRef = await this.users.add(data);
 
-    const loginDto = {
-      Email: dto.Email,
-      Password: dto.Password,
+    const loginDto: LoginDto = {
+      email: dto.email,
+      password: dto.password,
     };
 
-    if (Plantype !== 'FREE') {
-      return myUser;
-    } else {
-      if (myUser) {
-        const result = await this.authService.login(loginDto);
-        return result;
-      }
+    const newUser = await docRef.get();
+
+    if (planType !== 'FREE') {
+      return newUser;
+    }
+    if (newUser) {
+      const result = await this.login(loginDto);
+      return result;
     }
   }
-  private userSelect = {
-    id: true,
-    Name: true,
-    Email: true,
-    Cpf: true,
-    Plantime: true,
-    Password: true,
-    Plantype: true,
-    createdAt: true,
-    updatedAt: true,
-  };
 
-  findAll() {
-    return this.prisma.user.findMany({
-      select: {
-        id: true,
-        Name: true,
-        Email: true,
-        Password: true,
-        Cpf: true,
-      },
+  async login(loginDto: LoginDto): Promise<LoginResponseDto> {
+    const { email, password } = loginDto;
+
+    // Procura e checa se o user existe, usando o nickname
+    const user = await this.findUserByEmail(email);
+
+    if (!user) {
+      throw new UnauthorizedException('Usuário e/ou senha inválidos');
+    }
+
+    // Valida se a senha informada é corretaa
+    const isHashValid = await bcrypt.compare(password, user.password);
+
+    if (!isHashValid) {
+      throw new UnauthorizedException('Usuário e/ou senha inválidos');
+    }
+
+    delete user.password;
+
+    return {
+      token: this.jwtService.sign(
+        { email },
+        { secret: process.env.JWT_SECRET },
+      ),
+      user,
+    };
+  }
+
+  async findAll() {
+    const snapshot = await this.users.get();
+
+    const users = [];
+    snapshot.forEach((snap) => {
+      const userData = snap.data();
+      users.push(userData);
     });
+
+    return users;
   }
 
   async findUserByEmail(email: string) {
-    const record = await this.prisma.user.findUnique({
-      where: { Email: email },
-      select: this.userSelect,
+    const snapshot = await this.users.where('email', '==', email).get();
+
+    const users = [];
+    snapshot.forEach((snap) => {
+      const userData = snap.data();
+      users.push(userData);
     });
 
-    return record;
+    return users[0];
   }
 
   async findUserByIp(ip: string) {
-    const record = await this.prisma.user.findUnique({
-      where: { ip: ip },
-      select: this.userSelect,
+    const snapshot = await this.users.where('ip', '==', ip).get();
+
+    const users = [];
+    snapshot.forEach((snap) => {
+      const userData = snap.data();
+      users.push(userData);
     });
 
-    if (!record) {
-      return false;
-    }
-
-    return true;
+    return !!users.length;
   }
 
-  async findById(id: string) {
-    const record = await this.prisma.user.findUnique({
-      where: { id },
-      select: this.userSelect,
+  async findUId(id: string) {
+    const snapshot = await this.users.where('id', '==', id).get();
+
+    const uids = [];
+    snapshot.forEach((snap) => {
+      snap.id;
+      uids.push(snap.id);
     });
 
-    if (!record) {
-      throw new NotFoundException(`Registro com o ID '${id}' não encontrado.`);
-    }
-
-    return record;
+    return uids[0];
   }
 
   async updateRecoveryPassword(id, recoverPasswordToken) {
-    const record = await this.prisma.user.update({
-      where: { id },
-      data: { recoverPasswordToken },
-    });
+    const uid = await this.findUId(id);
 
-    return record;
+    this.users.doc(uid).update({ recoverPasswordToken });
   }
 
-  async updatePassword(id: string, Password: string) {
-    const updatedUser = await this.prisma.user.update({
-      where: {
-        id,
-      },
-      data: {
-        recoverPasswordToken: null,
-        Password,
-      },
+  async updatePassword(id: string, password: string) {
+    const uid = await this.findUId(id);
+    await this.users.doc(uid).update({
+      recoverPasswordToken: null,
+      password,
     });
-
-    delete updatedUser.Password;
-
+    const updatedUser = this.findOne(id);
     return updatedUser;
   }
 
   async updateMyPassword(updateMyPasswordDto: UpdateMyPasswordDto, id: string) {
     const data = { ...updateMyPasswordDto };
-    return this.prisma.user.update({ where: { id }, data });
+    const uid = await this.findUId(id);
+    const result = await this.users.doc(uid).update(data);
+    return !!result.writeTime;
   }
 
   async findByToken(recoverPasswordToken: any) {
-    return this.prisma.user.findFirst({ where: { recoverPasswordToken } });
+    const snapshot = await this.users
+      .where('recoverPasswordToken', '==', recoverPasswordToken)
+      .get();
+
+    const users = [];
+    snapshot.forEach((snap) => {
+      const userData = snap.data();
+      users.push(userData);
+    });
+
+    return users[0];
   }
 
-  async findOne(id: string) {
-    return this.findById(id);
+  async findOne(uid: string) {
+    return (await this.users.doc(uid).get()).data();
   }
 
   async delete(id: string) {
-    await this.findById(id);
+    try {
+      const uid = await this.findUId(id);
 
-    await this.prisma.user.delete({ where: { id } });
+      await this.users.doc(uid).delete();
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   handleError(error: Error): undefined {

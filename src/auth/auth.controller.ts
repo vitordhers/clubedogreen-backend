@@ -14,19 +14,20 @@ import { AuthService } from './auth.service';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { LoggedUser } from './logged-user-decorator';
+import { UserService } from 'src/user/user.service';
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Post()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Realizar login, recebendo um token de autenticação',
   })
-  login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
+    return await this.userService.login(loginDto);
   }
 
   @Get()
